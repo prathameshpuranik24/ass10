@@ -1,33 +1,37 @@
-pipeline {
-  environment{
-    registry = "prathameshpuranik/demo"
+pipeline 
+{
+  environment 
+  { 
+    registry = "prathameshpuranik/demoimage"
     registryCredential = 'dockerid'
     dockerImage = ''
   }
-  
 agent any
 
-stages {
-
-          stage('Build image') 
+stages 
+{
+  stage('Build image')
+  {
+    steps
+    { 
+      script
+      {
+          dockerImage = docker.build registry + ":$BUILD_NUMBER"
+      }
+    }
+  }
+  stage('Deploy the image')
+  {
+    steps
+    { 
+      script
+      {
+          docker.withRegistry( '',registryCredential )
           {
-             steps {
-                    script{
-                            dockerImage = docker.build registry + ":$BUILD_NUMBER"
-                          }
-                   }
+            dockerImage.push()
           }
-          stage('Deploy the image')
-          {
-             steps{
-                   script{
-                           docker.withRegistry('',registryCredential)
-                           {
-                             dockerImage.push()
-                           }
-                         }
-                  }
-          }
-       }  
-  
+      }
+    }
+  }
+}
 }
